@@ -1,0 +1,185 @@
+name: File Operations
+timeSelector: {}
+sharedTimeInterval:
+  enabled: false
+  isLive: false
+  start: 1d
+widgets:
+  a106116a-40d8-4760-885b-91ae3ebc7649:
+    x: 0
+    y: 12
+    height: 5
+    queryString: |-
+      #type = nextcloud app=admin_audit message="File *" user=?ncUser ncFileOperation=?fileOperation |
+      worldmap(ip=remoteAddr)
+    end: now
+    start: 7d
+    width: 7
+    options:
+      magnitudeMode: size
+      norm: true
+      opacityMode: size
+    visualization: world-map
+    title: File operation locations
+    isLive: false
+    type: query
+  2ded17da-fce5-4f30-88f4-c106d73918b8:
+    x: 0
+    y: 4
+    height: 4
+    queryString: |-
+      #type=nextcloud app=admin_audit message="File*" user=?ncUser ncFileOperation=?fileOperation |
+      rename(user, as=User) | rename(ncFileOperation, as="File operation") |
+      groupby([User,"File operation"]) |
+      rename(_count, as=Count)
+    visualization: table-view
+    end: now
+    start: 7d
+    width: 5
+    title: File operations by user
+    isLive: false
+    type: query
+  8f70394f-4f8f-4ab7-ab74-faef08ddead3:
+    x: 5
+    y: 4
+    height: 4
+    queryString: |-
+      #type=nextcloud app=admin_audit message="File *" user=?ncUser ncFileOperation=?fileOperation |
+      iplocation(remoteAddr) |
+      case { regex("(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)", field=remoteAddr, strict=false) | remoteAddr.org:="-private IP address-"; * } |
+      asn(remoteAddr) |
+      rename(field=user, as=User) | rename(field=remoteAddr.country, as=Country) | rename(field=remoteAddr.state, as="State/Region") |rename(field=remoteAddr.city, as=City) | rename(field=remoteAddr.org, as="IP Org.") |
+      groupby([User,Country,"State/Region",City,"IP Org."]) | rename(field=_count, as=Count)
+    visualization: table-view
+    end: now
+    start: 7d
+    width: 7
+    title: File operation by user locations
+    isLive: false
+    type: query
+  3c3c8184-5e38-46a0-b7d3-6e27fcbb8229:
+    x: 6
+    y: 0
+    height: 4
+    queryString: |-
+      #type = nextcloud app=admin_audit message = "File*" user=?ncUser ncFileOperation=?fileOperation |
+      top(ncFileOperation)
+    end: now
+    start: 7d
+    width: 6
+    options:
+      innerRadius: 0
+      series:
+        accessed:
+          color: '#579ABE'
+        updated:
+          color: '#F39A27'
+        written:
+          color: '#C23B23'
+        renamed:
+          color: '#EADA52'
+        deleted:
+          color: '#976ED7'
+        created:
+          color: '#03C03C'
+      withLegendTitle: false
+    visualization: pie-chart
+    title: File operations by action
+    isLive: false
+    type: query
+  5645ee76-3d47-4d99-a8e5-1458613fed39:
+    x: 0
+    y: 8
+    height: 4
+    queryString: |-
+      #type = nextcloud app=admin_audit message = "File*" user=?ncUser ncFileOperation=?fileOperation |
+      timechart(user)
+    end: now
+    start: 7d
+    width: 6
+    options:
+      interpolation: step-after
+      showDataPoints: false
+      connect-points: false
+      stacking: normal
+      yAxisScale: linear
+      show-utc: false
+      imputation: none
+    visualization: time-chart
+    title: Users performing file operations over time
+    isLive: false
+    type: query
+  da538add-a1dd-4f88-8873-3624d25c62e2:
+    x: 6
+    y: 8
+    height: 4
+    queryString: |-
+      #type=nextcloud app=admin_audit message="File*" user=?ncUser ncFileOperation=?fileOperation |
+      top(user, rest="Other users")
+    end: now
+    start: 7d
+    width: 6
+    options:
+      innerRadius: 0
+      series: {}
+      withLegendTitle: false
+    visualization: pie-chart
+    title: Users performing file operations
+    isLive: false
+    type: query
+  d61b178e-254e-46c5-87a6-4e757c2dc3e3:
+    x: 0
+    y: 0
+    height: 4
+    queryString: |-
+      #type=nextcloud app=admin_audit message="File*" user=?ncUser ncFileOperation=?fileOperation |
+      timechart(ncFileOperation)
+    end: now
+    start: 7d
+    width: 6
+    options:
+      series:
+        accessed:
+          color: '#579ABE'
+        updated:
+          color: '#F39A27'
+        written:
+          color: '#C23B23'
+        renamed:
+          color: '#EADA52'
+        deleted:
+          color: '#976ED7'
+        created:
+          color: '#03C03C'
+      interpolation: step-after
+      connect-points: false
+      stacking: normal
+      yAxisScale: linear
+      imputation: none
+    visualization: time-chart
+    title: File operations by type over time
+    isLive: false
+    type: query
+$schema: https://schemas.humio.com/dashboard/v0.7.0
+parameters:
+  fileOperation:
+    isMultiParam: false
+    label: File operation type
+    query: '#type=nextcloud app=admin_audit message="File*" | groupby(ncFileOperation,
+      function=[])'
+    timeInterval: 1d
+    useDashboardTimeIfSet: true
+    type: query
+    defaultValue: '*'
+    order: 50
+    valueField: ncFileOperation
+  ncUser:
+    isMultiParam: false
+    label: User
+    query: '#type=nextcloud app=admin_audit | groupby(user, function=[])'
+    timeInterval: 1d
+    useDashboardTimeIfSet: true
+    type: query
+    defaultValue: '*'
+    order: 50
+    valueField: user

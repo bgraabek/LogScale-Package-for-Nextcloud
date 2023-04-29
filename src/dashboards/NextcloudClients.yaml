@@ -1,0 +1,108 @@
+name: Nextcloud Clients
+timeSelector: {}
+sharedTimeInterval:
+  enabled: false
+  isLive: false
+  start: 1d
+widgets:
+  005f96f4-eca6-459c-a441-f89097b89829:
+    x: 0
+    y: 0
+    height: 4
+    queryString: |-
+      #type=nextcloud app=admin_audit message="File*" |
+      regex(".+\((?<ncClientOS>.+)\) (?<ncClientAgent>.+)\/(?<ncClientAgentVersion>\d+\.\d+\.\d+\w+|\d+\.\d+\.\d+)") |
+      replace(mirall, with="Desktop client", field=ncClientAgent) |
+      replace("Nextcloud-iOS", with="Mobile app", field=ncClientAgent) |
+      replace("Nextcloud-android", with="Mobile app", field=ncClientAgent) |
+      ncClientAgent="Desktop client" OR ncClientAgent="Mobile app" |
+      rename(ncClientAgent, as="Type of client") |
+      top("Type of client") |
+      rename(_count, as=Count)
+    visualization: table-view
+    end: now
+    start: 1d
+    width: 6
+    title: Client type used for file operations by number of operations
+    isLive: false
+    type: query
+  48d1299d-5b45-4fbe-b9fb-dfebf636968f:
+    x: 6
+    y: 4
+    height: 4
+    queryString: |-
+      #type=nextcloud app=admin_audit message="File*" |
+      regex(".+\((?<ncClientOS>.+)\) (?<ncClientAgent>.+)\/(?<ncClientAgentVersion>\d+\.\d+\.\d+\w+|\d+\.\d+\.\d+)") |
+      replace(mirall, with="Desktop client", field=ncClientAgent) |
+      replace("Nextcloud-iOS", with="Mobile app", field=ncClientAgent) |
+      replace("Nextcloud-android", with="Mobile app", field=ncClientAgent) |
+      ncClientAgent="Desktop client" OR ncClientAgent="Mobile app" |
+      rename(ncClientOS, as="Operating System") |
+      top("Operating System") |
+      rename(_count, as=Count)
+    end: now
+    start: 1d
+    width: 6
+    options:
+      innerRadius: 0
+      legendPosition: right
+      series:
+        Macintosh:
+          color: '#F39A27'
+        Windows:
+          color: '#C23B23'
+        iOS:
+          color: '#03C03C'
+      withLegendTitle: false
+    visualization: pie-chart
+    title: Client Operating System used for file operations
+    isLive: false
+    type: query
+  6ad7876f-be99-4d71-bba3-5317a0e16cc7:
+    x: 6
+    y: 0
+    height: 4
+    queryString: |-
+      #type=nextcloud app=admin_audit message="File*" |
+      regex(".+\((?<ncClientOS>.+)\) (?<ncClientAgent>.+)\/(?<ncClientAgentVersion>\d+\.\d+\.\d+\w+|\d+\.\d+\.\d+)") |
+      replace(mirall, with="Desktop client", field=ncClientAgent) |
+      replace("Nextcloud-iOS", with="Mobile app", field=ncClientAgent) |
+      replace("Nextcloud-android", with="Mobile app", field=ncClientAgent) |
+      ncClientAgent="Desktop client" OR ncClientAgent="Mobile app" |
+      rename(ncClientAgent, as="Type of client") |
+      top("Type of client") |
+      rename(_count, as=Count)
+    end: now
+    start: 1d
+    width: 6
+    options:
+      innerRadius: 0
+      legendPosition: right
+      series: {}
+      withLegendTitle: false
+    visualization: pie-chart
+    title: Client type used for file operations
+    isLive: false
+    type: query
+  f6e23130-b8c7-435c-a73d-48f47a12f6ae:
+    x: 0
+    y: 4
+    height: 4
+    queryString: |-
+      #type=nextcloud app=admin_audit message="File*" |
+      regex(".+\((?<ncClientOS>.+)\) (?<ncClientAgent>.+)\/(?<ncClientAgentVersion>\d+\.\d+\.\d+\w+|\d+\.\d+\.\d+)") |
+      replace(mirall, with="Desktop client", field=ncClientAgent) |
+      replace("Nextcloud-iOS", with="Mobile app", field=ncClientAgent) |
+      replace("Nextcloud-android", with="Mobile app", field=ncClientAgent) |
+      ncClientAgent="Desktop client" OR ncClientAgent="Mobile app" |
+      rename(ncClientOS, as="Operating System") |
+      top("Operating System") |
+      rename(_count, as=Count)
+    visualization: table-view
+    end: now
+    start: 1d
+    width: 6
+    title: Client Operating System used for file operations
+    isLive: false
+    type: query
+$schema: https://schemas.humio.com/dashboard/v0.7.0

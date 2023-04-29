@@ -1,0 +1,21 @@
+name: About
+timeSelector: {}
+sharedTimeInterval:
+  enabled: false
+  isLive: false
+  start: 1d
+widgets:
+  note-1682677457487-0:
+    x: 0
+    y: 0
+    height: 6
+    text: "# Falcon LogScale Package for Nextcloud\nThis package visualises [Nextcloud\
+      \ application server data](http://nextcloud.com).\n\n## Data used for the dashboards\n\
+      To populate the dashboard, use the LogScale collector to collect the \"audit.log\"\
+      \ and the \"nextcloud.log\" files.\n\n\nThis is not an official CrowdStrike\
+      \ package nor is it supported by CrowdStrike or Nextcloud and neither company\
+      \ have any responsibility for it.\n        "
+    width: 12
+    title: About
+    type: note
+$schema: https://schemas.humio.com/dashboard/v0.7.0

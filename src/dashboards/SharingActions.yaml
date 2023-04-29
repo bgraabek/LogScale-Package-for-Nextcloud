@@ -1,0 +1,28 @@
+name: Sharing Actions
+timeSelector: {}
+sharedTimeInterval:
+  enabled: false
+  isLive: false
+  start: 1d
+widgets:
+  a47f747c-462c-4770-91e8-ebe170561dfb:
+    x: 0
+    y: 0
+    description: 'How to read table: at <time> user <X> <shared/unshared> a <file/folder>
+      named <file or folder name> using <share method> whilst located in <country>'
+    height: 9
+    queryString: |-
+      #type=nextcloud app=admin_audit |
+      regex("The (?<ncFsObject>file|folder) \"(?<ncFsObjectName>.*)\" with ID .* has been (?<ncFsAction>shared|unshared) (\(Share ID.*|(via|to the|from the) (?<ncSharingMethod>link|user|group)( |)(|\"(?<ncUser>.*)\") (\(Share ID.*|with permissions \"(?<ncFsPermissions>\d*)\"))", field=message) |
+      iplocation(remoteAddr) |
+      asn(remoteAddr) |
+      rename(user, as=User) | rename(ncFsAction, as="Sharing action") | rename(ncFsObject, as="Files system object") | rename(ncFsObjectName, as="Folder/file name") | rename(ncSharingMethod, as="Sharing method") | rename(remoteAddr.country, as=Country) | rename(remoteAddr.org, as="IP Org.") |
+      select([@timestamp,User,"Sharing action","Files system object","Folder/file name","Sharing method",Country,"IP Org."])
+    visualization: table-view
+    end: now
+    start: 7d
+    width: 12
+    title: Sharing actions
+    isLive: false
+    type: query
+$schema: https://schemas.humio.com/dashboard/v0.7.0
