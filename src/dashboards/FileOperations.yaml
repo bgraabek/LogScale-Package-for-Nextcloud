@@ -10,8 +10,11 @@ widgets:
     y: 12
     height: 5
     queryString: |-
-      #type = nextcloud app=admin_audit message="File *" user=?ncUser ncFileOperation=?fileOperation |
-      worldmap(ip=remoteAddr)
+      #type=nextcloud app=admin_audit message="File *" user=?ncUser ncFileOperation=?fileOperation |
+      default(value="-unknown-", field=remoteAddr.country) |
+      iplocation(remoteAddr) |
+      remoteAddr.country=?countryToken |
+      worldmap(lat=remoteAddr.lat, lon=remoteAddr.lon)
     end: now
     start: 7d
     width: 7
@@ -29,6 +32,9 @@ widgets:
     height: 4
     queryString: |-
       #type=nextcloud app=admin_audit message="File*" user=?ncUser ncFileOperation=?fileOperation |
+      default(value="-unknown-", field=remoteAddr.country) |
+      iplocation(remoteAddr) |
+      remoteAddr.country=?countryToken |
       rename(user, as=User) | rename(ncFileOperation, as="File operation") |
       groupby([User,"File operation"]) |
       rename(_count, as=Count)
@@ -45,7 +51,9 @@ widgets:
     height: 4
     queryString: |-
       #type=nextcloud app=admin_audit message="File *" user=?ncUser ncFileOperation=?fileOperation |
+      default(value="-unknown-", field=remoteAddr.country) |
       iplocation(remoteAddr) |
+      remoteAddr.country=?countryToken |
       case { regex("(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)", field=remoteAddr, strict=false) | remoteAddr.org:="-private IP address-"; * } |
       asn(remoteAddr) |
       rename(field=user, as=User) | rename(field=remoteAddr.country, as=Country) | rename(field=remoteAddr.state, as="State/Region") |rename(field=remoteAddr.city, as=City) | rename(field=remoteAddr.org, as="IP Org.") |
@@ -62,7 +70,10 @@ widgets:
     y: 0
     height: 4
     queryString: |-
-      #type = nextcloud app=admin_audit message = "File*" user=?ncUser ncFileOperation=?fileOperation |
+      #type=nextcloud app=admin_audit message="File*" user=?ncUser ncFileOperation=?fileOperation |
+      default(value="-unknown-", field=remoteAddr.country) |
+      iplocation(remoteAddr) |
+      remoteAddr.country=?countryToken |
       top(ncFileOperation)
     end: now
     start: 7d
@@ -92,7 +103,10 @@ widgets:
     y: 8
     height: 4
     queryString: |-
-      #type = nextcloud app=admin_audit message = "File*" user=?ncUser ncFileOperation=?fileOperation |
+      #type=nextcloud app=admin_audit message="File*" user=?ncUser ncFileOperation=?fileOperation |
+      default(value="-unknown-", field=remoteAddr.country) |
+      iplocation(remoteAddr) |
+      remoteAddr.country=?countryToken |
       timechart(user)
     end: now
     start: 7d
@@ -115,6 +129,9 @@ widgets:
     height: 4
     queryString: |-
       #type=nextcloud app=admin_audit message="File*" user=?ncUser ncFileOperation=?fileOperation |
+      default(value="-unknown-", field=remoteAddr.country) |
+      iplocation(remoteAddr) |
+      remoteAddr.country=?countryToken |
       top(user, rest="Other users")
     end: now
     start: 7d
@@ -133,6 +150,9 @@ widgets:
     height: 4
     queryString: |-
       #type=nextcloud app=admin_audit message="File*" user=?ncUser ncFileOperation=?fileOperation |
+      default(value="-unknown-", field=remoteAddr.country) |
+      iplocation(remoteAddr) |
+      remoteAddr.country=?countryToken |
       timechart(ncFileOperation)
     end: now
     start: 7d
@@ -162,6 +182,18 @@ widgets:
     type: query
 $schema: https://schemas.humio.com/dashboard/v0.7.0
 parameters:
+  countryToken:
+    isMultiParam: false
+    label: Country
+    query: '#type=nextcloud app=admin_audit message="File*" | default(value="-unknown-",
+      field=remoteAddr.country) | iplocation(remoteAddr) | groupby(remoteAddr.country,
+      function=[])'
+    timeInterval: 7d
+    useDashboardTimeIfSet: true
+    type: query
+    defaultValue: '*'
+    order: 70
+    valueField: remoteAddr.country
   fileOperation:
     isMultiParam: false
     label: File operation type
@@ -176,8 +208,8 @@ parameters:
   ncUser:
     isMultiParam: false
     label: User
-    query: '#type=nextcloud app=admin_audit | groupby(user, function=[])'
-    timeInterval: 1d
+    query: '#type=nextcloud app=admin_audit message="File*" | groupby(user, function=[])'
+    timeInterval: 7d
     useDashboardTimeIfSet: true
     type: query
     defaultValue: '*'
