@@ -10,11 +10,16 @@ widgets:
     y: 0
     height: 6
     text: "# Falcon LogScale Package for Nextcloud\nThis package visualises [Nextcloud\
-      \ application server data](http://nextcloud.com).\n\n## Data used for the dashboards\n\
-      To populate the dashboard, use the LogScale collector to collect the \"audit.log\"\
-      \ and the \"nextcloud.log\" files.\n\n\nThis is not an official CrowdStrike\
-      \ package nor is it supported by CrowdStrike or Nextcloud and neither company\
-      \ have any responsibility for it.\n        "
+      \ application server data](http://nextcloud.com).\n## Data used for the dashboards\n\
+      Data from the Nextcloud \"audit.log\" and \"nextcloud.log\" files is collected.\
+      \ LogScale queries drive the dashboards that analyse and visualise the Nextcloud\
+      \ data.\n## Support\nThe best place for support is in the [GitHub repository\
+      \ discussions](https://github.com/bgraabek/LogScale-Package-for-Nextcloud/discussions)\
+      \ for this package.  \nYou can also raise issues is in the [GitHub repository\
+      \ issues](https://github.com/bgraabek/LogScale-Package-for-Nextcloud/issues)\
+      \ section.\n## Legal\nThis is not an official CrowdStrike package nor is it\
+      \ supported by CrowdStrike or Nextcloud and neither company have any responsibility\
+      \ for it."
     width: 12
     title: About
     type: note
