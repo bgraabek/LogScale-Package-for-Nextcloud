@@ -27,8 +27,9 @@ fieldsToBeRemovedBeforeParsing: []
 $schema: https://schemas.humio.com/parser/v0.2.0
 script: |-
   parseJson() |
-
-  // One of the most important visualisations in the Nextcloud package concerns what is being done with folders/files, hence we extract that information into a separate field at ingest time.
+  // The Nextcloud package does not use the reqId field, hence the parser drops it. If you want to keep the field, you may remove the drop statement.
+  drop(reqId) |
+  // One of the most important visualisations in the Nextcloud package concerns what is being done with folders/files (created, accessed, renamed etc), hence we extract that information into a separate field at ingest time.
   case { message = "File*" | regex("File (?<ncFileOperation>\w+):", field=message); * } |
 
   parseTimestamp(field=time)
