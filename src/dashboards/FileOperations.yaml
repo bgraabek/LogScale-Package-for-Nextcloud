@@ -54,7 +54,7 @@ widgets:
       default(value="-unknown-", field=remoteAddr.country) |
       iplocation(remoteAddr) |
       remoteAddr.country=?countryToken |
-      case { regex("(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)", field=remoteAddr, strict=false) | remoteAddr.org:="-private IP address-"; * } |
+      case { cidr(remoteAddr, subnet=["224.0.0.0/4", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "127.0.0.0/8", "169.254.0.0/16", "0.0.0.0/32"]) | remoteAddr.org:="-private IP address-"; * } |
       asn(remoteAddr) |
       rename(field=user, as=User) | rename(field=remoteAddr.country, as=Country) | rename(field=remoteAddr.state, as="State/Region") |rename(field=remoteAddr.city, as=City) | rename(field=remoteAddr.org, as="IP Org.") |
       groupby([User,Country,"State/Region",City,"IP Org."]) | rename(field=_count, as=Count)
@@ -80,6 +80,7 @@ widgets:
     width: 6
     options:
       innerRadius: 0
+      legendPosition: right
       series:
         accessed:
           color: '#579ABE'
@@ -112,6 +113,8 @@ widgets:
     start: 7d
     width: 6
     options:
+      legendPosition: right
+      series: {}
       interpolation: step-after
       showDataPoints: false
       connect-points: false
@@ -138,6 +141,7 @@ widgets:
     width: 6
     options:
       innerRadius: 0
+      legendPosition: right
       series: {}
       withLegendTitle: false
     visualization: pie-chart
@@ -158,6 +162,7 @@ widgets:
     start: 7d
     width: 6
     options:
+      legendPosition: right
       series:
         accessed:
           color: '#579ABE'
