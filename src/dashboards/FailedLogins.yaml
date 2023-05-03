@@ -1,0 +1,126 @@
+name: Failed Logins
+timeSelector: {}
+sharedTimeInterval:
+  enabled: false
+  isLive: false
+  start: 1d
+widgets:
+  7592b516-903b-40ce-bafb-2729ddf7b6b5:
+    x: 6
+    y: 8
+    height: 4
+    queryString: |-
+      #type=nextcloud app=core message="Login failed*" |
+      rename(userAgent, as="Browser or client") |
+      groupby("Browser or client") |
+      sort(_count) |
+      rename(_count, as=Count)
+    visualization: table-view
+    end: now
+    start: 7d
+    width: 6
+    title: Failed logins by browser or client
+    isLive: false
+    type: query
+  a9f1c892-afef-449a-938c-010fa243283c:
+    x: 6
+    y: 4
+    height: 4
+    queryString: |-
+      #type=nextcloud app=core message="Login failed*" |
+      regex("Login failed: '(?<ncLoginFailedUser>\S+)'", field=message) |
+      rename(ncLoginFailedUser, as="Attempted username") |
+      groupby("Attempted username") |
+      sort(_count) |
+      rename(_count, as=Count)
+    visualization: table-view
+    end: now
+    start: 7d
+    width: 6
+    title: Failed logins by user name
+    isLive: false
+    type: query
+  1f0dbad6-044a-4d90-a510-43b0d4cedfa0:
+    x: 0
+    y: 4
+    height: 4
+    queryString: |-
+      #type=nextcloud app=core message="Login failed*" |
+      regex("Login failed: '(?<ncLoginFailedUser>\S+)'", field=message) |
+      rename(ncLoginFailedUser, as="Attempted username") |
+      timeChart("Attempted username")
+    end: now
+    start: 7d
+    width: 6
+    options:
+      legendPosition: right
+      series: {}
+      interpolation: step-after
+      connect-points: false
+      stacking: normal
+      yAxisScale: linear
+      imputation: none
+    visualization: time-chart
+    title: Failed logins over time
+    isLive: false
+    type: query
+  62d6fb1b-4130-42e1-8357-68794357ad90:
+    x: 0
+    y: 0
+    height: 4
+    queryString: |-
+      #type=nextcloud app=core message="Login failed*" |
+      regex("Login failed: '(?<ncLoginFailedUser>\S+)'", field=message) |
+      !cidr(remoteAddr, subnet=["224.0.0.0/4", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "127.0.0.0/8", "169.254.0.0/16", "0.0.0.0/32"]) |
+      iplocation(remoteAddr) | asn(remoteAddr) |
+      rename(ncLoginFailedUser, as="Attempted username") | rename(remoteAddr, as="IP address") | rename(remoteAddr.country, as=Country) | rename(remoteAddr.state, as="State/Region") |rename(remoteAddr.city, as=City) | rename(remoteAddr.org, as="IP Org.") |
+      groupby(["Attempted username", "IP address", "IP Org.", Country, "State/Region", City]) |
+      sort(_count) |
+      rename(_count, as=Count)
+    visualization: table-view
+    end: now
+    start: 7d
+    width: 8
+    title: Failed logins from external IP addresses
+    isLive: false
+    type: query
+  20343976-01e3-4a09-98c2-d10a1e65acbb:
+    x: 0
+    y: 8
+    height: 4
+    queryString: |-
+      #type=nextcloud app=core message="Login failed*" |
+      regex("Login failed: '(?<ncLoginFailedUser>\S+)'", field=message) |
+      !cidr(remoteAddr, subnet=["224.0.0.0/4", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "127.0.0.0/8", "169.254.0.0/16", "0.0.0.0/32"]) |
+      iplocation(remoteAddr) | asn(remoteAddr) |
+      rename(remoteAddr, as="IP address") | rename(remoteAddr.country, as=Country) | rename(remoteAddr.state, as="State/Region") |rename(remoteAddr.city, as=City) | rename(remoteAddr.org, as="IP Org.") |
+      groupby(["IP Org.", Country, "State/Region", City]) |
+      sort(_count) |
+      rename(_count, as=Count)
+    visualization: table-view
+    end: now
+    start: 7d
+    width: 6
+    title: Failed logins by location
+    isLive: false
+    type: query
+  79c5acdb-f84d-4121-b088-4dba95feffb5:
+    x: 8
+    y: 0
+    height: 4
+    queryString: |-
+      #type=nextcloud app=core message="Login failed*" |
+      regex("Login failed: '(?<ncLoginFailedUser>\S+)'", field=message) |
+      cidr(remoteAddr, subnet=["224.0.0.0/4", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "127.0.0.0/8", "169.254.0.0/16", "0.0.0.0/32"]) |
+      rename(remoteAddr, as="IP address") | rename(ncLoginFailedUser, as="Attempted username") |
+      groupby(["Attempted username", "IP address", "IP Org.", Country, "State/Region", City]) |
+      sort(_count) |
+      rename(_count, as=Count)
+    visualization: table-view
+    end: now
+    start: 7d
+    width: 4
+    title: Failed logins from internal IP address ranges
+    isLive: false
+    type: query
+$schema: https://schemas.humio.com/dashboard/v0.7.0

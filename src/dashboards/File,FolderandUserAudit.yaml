@@ -1,0 +1,99 @@
+name: File, Folder and User Audit
+timeSelector: {}
+sharedTimeInterval:
+  enabled: false
+  isLive: false
+  start: 1d
+widgets:
+  05ad04a5-3361-4c26-8edf-3c7b6c99da3f:
+    x: 0
+    y: 2
+    height: 10
+    queryString: |-
+      #type=nextcloud app=admin_audit user=?userToken ncFileOperation=?ncFileOperationToken |
+      regex("File \w+: \"(?<ncFileName>.+)\"", field=message) |
+      ncFileName=?ncFileNameToken |
+      default(value="-unknown-", field=remoteAddr.country) |
+      iplocation(remoteAddr) |
+      remoteAddr.country=?countryToken |
+      case { cidr(remoteAddr, subnet=["224.0.0.0/4", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "127.0.0.0/8", "169.254.0.0/16", "0.0.0.0/32"]) | remoteAddr.org:="-private IP address-"; * } |
+      asn(remoteAddr) |
+      remoteAddr.org=?ipOrgToken |
+      rename(user, as=User) | rename(ncFileOperation, as="File Operation") | rename(ncFileName, as="Folder or file name") | rename(remoteAddr, as="IP address") |
+      rename(remoteAddr.country, as=Country) | rename(remoteAddr.org, as="IP Org.") |
+      select([@timestamp,User,"File Operation","Folder or file name","IP address",Country,"IP Org."])
+    visualization: table-view
+    end: now
+    start: 7d
+    width: 12
+    title: File, Folder and User Audit
+    isLive: false
+    type: query
+  note-1683040540128-0:
+    x: 0
+    y: 0
+    height: 2
+    text: "This dashboard provides answers to questions such as: \"what file operations\
+      \ did user X perform when?\", \"who did what to file Y when?\",  \"when did\
+      \ user X do something to file Y?\", \"From which IP organisation  have file\
+      \ operations been performed?\"  \nUse the * wildcard when searching. E.g. if\
+      \ the user or file name begins with abc, search for /abc*. If it contains abc,\
+      \ search for \\*abc\\*.  \nThe “User name” of unknown users accessing files\
+      \ or folders via a share link is – (minus minus)."
+    width: 12
+    title: Description
+    type: note
+$schema: https://schemas.humio.com/dashboard/v0.7.0
+parameters:
+  userToken:
+    isMultiParam: false
+    label: User
+    query: '#type=nextcloud app=admin_audit message="File*" | groupby(user, function=[])'
+    timeInterval: 7d
+    useDashboardTimeIfSet: true
+    type: query
+    defaultValue: '*'
+    order: 50
+    valueField: user
+  ncFileOperationToken:
+    isMultiParam: false
+    label: File Operation
+    query: '#type=nextcloud app=admin_audit message="File*" | groupby(ncFileOperation,
+      function=[])'
+    timeInterval: 7d
+    useDashboardTimeIfSet: true
+    type: query
+    defaultValue: '*'
+    order: 60
+    valueField: ncFileOperation
+  ncFileNameToken:
+    isMultiParam: false
+    label: File Name
+    order: 70
+    type: text
+    defaultValue: '*'
+  countryToken:
+    isMultiParam: false
+    label: Country
+    query: '#type=nextcloud app=admin_audit message="File*" | default(value="-unknown-",
+      field=remoteAddr.country) | iplocation(remoteAddr) | groupby(remoteAddr.country,
+      function=[])'
+    timeInterval: 7d
+    useDashboardTimeIfSet: true
+    type: query
+    defaultValue: '*'
+    order: 80
+    valueField: remoteAddr.country
+  ipOrgToken:
+    isMultiParam: false
+    label: IP Org.
+    query: '#type=nextcloud app=admin_audit message="File*" | case { cidr(remoteAddr,
+      subnet=["224.0.0.0/4", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "127.0.0.0/8",
+      "169.254.0.0/16", "0.0.0.0/32"]) | remoteAddr.org:="-private IP address-"; *
+      } | asn(remoteAddr) | groupby(remoteAddr.org, function=[])'
+    timeInterval: 7d
+    useDashboardTimeIfSet: true
+    type: query
+    defaultValue: '*'
+    order: 90
+    valueField: remoteAddr.org
