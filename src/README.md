@@ -10,11 +10,10 @@ This package parses and visualises Nextcloud Hub logs
 * SecOps
 * ITOps
 ## Technology Vendor
-Nextcloud
+[Nextcloud](https://nextcloud.com/)
 
 ## Support
-This package is supported on a best-effort basis by Bjorn Graabek, bjorn.graabek@crowdstrike.com.  
-The best place for support is in the [GitHub repository discussions](https://github.com/bgraabek/LogScale-Package-for-Nextcloud/discussions) for this package. You can also raise issues is in the [GitHub repository issues](https://github.com/bgraabek/LogScale-Package-for-Nextcloud/issues) section.
+Best effort support for this package is in the [GitHub repository discussions](https://github.com/bgraabek/LogScale-Package-for-Nextcloud/discussions). You can also raise issues is in the [GitHub repository issues](https://github.com/bgraabek/LogScale-Package-for-Nextcloud/issues) section.
 
 ## Dependencies
 This package has been developed and tested with logs from Nextcloud v20.
